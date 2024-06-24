@@ -54,4 +54,4 @@ Evaluate the model's performance and implement techniques to improve accuracy, s
 Deploy the trained LeNet-5 model using a Flask web application. In this setup, users can upload an image through a web interface, which is then received by the Flask server. The server preprocesses the image, applying necessary transformations like resizing and normalization. The preprocessed image is fed to three different models for prediction, each providing its own prediction. These predictions are then aggregated using a voting mechanism to determine the final class label. The predicted label is subsequently displayed to the user through the web interface.
 
 # Conclusion
-This project demonstrates the implementation of a handwritten digit recognition system using the LeNet-5 model in PyTorch and deployment through a Flask web application. The steps cover data preprocessing, model training, evaluation, and web deployment.
+This project demonstrates the implementation of a handwritten digit recognition system using the LeNet-5 model in PyTorch and deployment through a Flask web application. The steps cover data preprocessing, model training and evaluation.
