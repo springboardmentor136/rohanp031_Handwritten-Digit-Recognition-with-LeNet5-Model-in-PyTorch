@@ -3,14 +3,6 @@
 # Introduction
 This project implements handwritten digit recognition using the LeNet-5 model in PyTorch. The workflow includes data preprocessing, model training, evaluation, and deployment through a Flask web application.
 
-# Prerequisites
-Python 3.7+
-PyTorch
-torchvision
-Flask
-NumPy
-Matplotlib
-
 # Data Preprocessing
 ## One Hot Encoding
 Convert labels to one hot encoding if necessary.
