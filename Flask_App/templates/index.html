@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLP Model Prediction</title>
+    <title>Model Predictions</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
         body {
@@ -73,6 +73,14 @@
                     <label class="custom-file-label" for="file-input">Upload Image</label>
                 </div>
             </div>
+            <div class="form-group">
+                <label for="model-type">Select Model</label>
+                <select id="model-type" name="model_type" class="form-control">
+                    <option value="mlp">MLP</option>
+                    <option value="cnn">CNN</option>
+                    <option value="lenet5">LeNet-5</option>
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary">Predict</button>
         </form>
         <p id="prediction-result"></p>
@@ -83,27 +91,39 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
         document.getElementById('file-input').addEventListener('change', function(event) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('uploaded-image').src = e.target.result;
-                document.querySelector('.custom-file-label').textContent = event.target.files[0].name;
-            }
-            reader.readAsDataURL(event.target.files[0]);
-        });
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('uploaded-image').src = e.target.result;
+        document.querySelector('.custom-file-label').textContent = event.target.files[0].name;
+    }
+    reader.readAsDataURL(event.target.files[0]);
+});
 
-        document.getElementById('upload-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var formData = new FormData(this);
+document.getElementById('upload-form').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-            fetch('/predict', {
-                method: 'POST',
-                body: formData
-            }).then(response => response.json()).then(data => {
-                document.getElementById('prediction-result').innerText = 'Prediction: ' + data.prediction;
-            }).catch(error => {
-                console.error('Error:', error);
-            });
-        });
+    var formData = new FormData(this);
+    var predictionResult = document.getElementById('prediction-result');
+
+    fetch('/predict', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Prediction Data:', data);
+        if (data.error) {
+            predictionResult.textContent = 'Error: ' + data.error;
+        } else {
+            predictionResult.textContent = 'Prediction: ' + data.prediction;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        predictionResult.textContent = 'Error: ' + error;
+    });
+});
+
     </script>
 </body>
 </html>
