@@ -42,6 +42,15 @@ Test the model using the test data to evaluate its performance.
 ## Evaluation and Improvement
 Evaluate the model's performance and implement techniques to improve accuracy, such as hyperparameter tuning, additional data augmentation, or using ensemble methods.
 
+# Additional Models
+To enhance the accuracy and robustness of the digit recognition system, two additional models were incorporated into the framework:
+
+## Model 1: Modified LeNet-5
+A variation of the LeNet-5 model with added dropout layers to prevent overfitting. This model includes slight modifications in the architecture to potentially improve generalization.
+
+## Model 2: Custom CNN
+A custom Convolutional Neural Network (CNN) designed with deeper layers and additional convolutional and pooling layers compared to LeNet-5. This model aims to capture more complex patterns in the handwritten digits.
+
 # Flask Application
 Deploy the trained LeNet-5 model using a Flask web application. In this setup, users can upload an image through a interface, which is then received by the Flask server. The server preprocesses the image, applying necessary transformations like resizing and normalization. The preprocessed image is fed to three different models for prediction, each providing its own prediction. These predictions are then aggregated using a voting mechanism to determine the final class label. The predicted label is subsequently displayed to the user through the interface.
 
