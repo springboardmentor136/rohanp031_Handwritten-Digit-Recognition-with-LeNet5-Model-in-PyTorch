@@ -11,50 +11,43 @@
     <style>
         body {
             padding-top: 50px;
-            background-color: #f5f5f5; /* Add a light gray background */
         }
-       .container {
-            max-width: 600px; /* Set a maximum width for the container */
-            margin: 40px auto; /* Add some margin and center the container */
-            padding: 20px; /* Add some padding to the container */
-            background-color: #fff; /* Set a white background */
-            border: 1px solid #ddd; /* Add a light gray border */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
-        }
-       .prediction {
+        .prediction {
             font-size: 1.5em;
             margin-top: 20px;
         }
-       .prediction span {
+        .prediction span {
             font-weight: bold;
         }
-        /* Add some styling to the form elements */
-       .form-control-file {
-            margin-bottom: 20px;
-        }
-       .btn-primary {
-            width: 100%; /* Make the button full-width */
-            margin-top: 20px;
-        }
-        /* Add some responsiveness to the layout */
-        @media (max-width: 768px) {
-           .container {
-                margin: 20px auto;
-                padding: 10px;
-            }
+        #canvas {
+            border: 1px solid black;
+            background-color: white;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center">Upload an Image to Classify</h1>
+        <h1 class="text-center">Upload or Draw an Image to Classify</h1>
         <!-- Form for image upload -->
-        <form id="upload-form" enctype="multipart/form-data" class="text-center">
+        <form id="upload-form" enctype="multipart/form-data" class="text-center mb-4">
             <div class="form-group">
                 <input type="file" id="file" name="file" accept="image/*" class="form-control-file">
             </div>
-            <button type="submit" class="btn btn-primary">Predict</button>
+            <button type="submit" class="btn btn-primary">Upload and Predict</button>
         </form>
+
+        <!-- Display the uploaded image -->
+        <div class="text-center mb-4">
+            <img id="uploaded-image" src="#" alt="Uploaded Image" style="display:none; max-width: 100%; height: auto;"/>
+        </div>
+
+        <h2 class="text-center">Or Draw a Digit</h2>
+        <div class="text-center mb-4">
+            <canvas id="canvas" width="280" height="280"></canvas><br>
+            <button id="clear-canvas" class="btn btn-secondary mt-2">Clear</button>
+            <button id="submit-canvas" class="btn btn-primary mt-2">Predict</button>
+        </div>
+
         <!-- Predictions section -->
         <div class="prediction text-center">
             <p>MLP Model Prediction: <span id="mlp_prediction"></span></p>
@@ -66,19 +59,73 @@
     <!-- jQuery script to handle form submission and display predictions -->
     <script>
         $(document).ready(function () {
-            // When the form is submitted
+            // Handle image upload form submission
             $('#upload-form').on('submit', function (event) {
-                event.preventDefault(); // Prevent the default form submission
-                
-                var formData = new FormData(this); // Create a FormData object with the form data
+                event.preventDefault();
+                var formData = new FormData(this);
+                var file = $('#file')[0].files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#uploaded-image').attr('src', e.target.result);
+                        $('#uploaded-image').show();
+                    }
+                    reader.readAsDataURL(file);
+                }
                 $.ajax({
-                    url: '/predict', // Set the URL to which the request is sent
-                    type: 'POST', // Set the request method to POST
-                    data: formData, // Set the data to be sent with the request
-                    contentType: false, // Prevent jQuery from setting the content type
-                    processData: false, // Prevent jQuery from processing the data
-                    success: function (response) { // On successful response
-                        // Display the predictions
+                    url: '/predict',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $('#mlp_prediction').text(response.mlp_prediction);
+                        $('#lenet_prediction').text(response.lenet_prediction);
+                        $('#cnn_prediction').text(response.cnn_prediction);
+                    }
+                });
+            });
+
+            // Set up canvas for drawing
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+            var drawing = false;
+
+            $('#canvas').mousedown(function () {
+                drawing = true;
+            }).mouseup(function () {
+                drawing = false;
+                ctx.beginPath();
+            }).mousemove(function (event) {
+                if (drawing) {
+                    var rect = canvas.getBoundingClientRect();
+                    var x = event.clientX - rect.left;
+                    var y = event.clientY - rect.top;
+                    ctx.lineWidth = 10;
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = 'black';
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                }
+            });
+
+            // Clear canvas
+            $('#clear-canvas').click(function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+
+            // Handle canvas submission
+            $('#submit-canvas').click(function () {
+                var dataURL = canvas.toDataURL();
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    data: {
+                        image: dataURL
+                    },
+                    success: function (response) {
                         $('#mlp_prediction').text(response.mlp_prediction);
                         $('#lenet_prediction').text(response.lenet_prediction);
                         $('#cnn_prediction').text(response.cnn_prediction);
