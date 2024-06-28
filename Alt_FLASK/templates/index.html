@@ -27,25 +27,38 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center">Upload or Draw an Image to Classify</h1>
-        <!-- Form for image upload -->
-        <form id="upload-form" enctype="multipart/form-data" class="text-center mb-4">
-            <div class="form-group">
-                <input type="file" id="file" name="file" accept="image/*" class="form-control-file">
-            </div>
-            <button type="submit" class="btn btn-primary">Upload and Predict</button>
-        </form>
-
-        <!-- Display the uploaded image -->
+        <h1 class="text-center">Image Classification</h1>
         <div class="text-center mb-4">
-            <img id="uploaded-image" src="#" alt="Uploaded Image" style="display:none; max-width: 100%; height: auto;"/>
+            <label>Choose an option:</label>
+            <select id="option-select">
+                <option value="upload">Upload an Image</option>
+                <option value="draw">Draw a Digit</option>
+            </select>
         </div>
 
-        <h2 class="text-center">Or Draw a Digit</h2>
-        <div class="text-center mb-4">
-            <canvas id="canvas" width="280" height="280"></canvas><br>
-            <button id="clear-canvas" class="btn btn-secondary mt-2">Clear</button>
-            <button id="submit-canvas" class="btn btn-primary mt-2">Predict</button>
+        <!-- Form for image upload -->
+        <div id="upload-section" style="display: none;">
+            <form id="upload-form" enctype="multipart/form-data" class="text-center mb-4">
+                <div class="form-group">
+                    <input type="file" id="file" name="file" accept="image/*" class="form-control-file">
+                </div>
+                <button type="submit" class="btn btn-primary">Upload and Predict</button>
+            </form>
+
+            <!-- Display the uploaded image -->
+            <div class="text-center mb-4">
+                <img id="uploaded-image" src="#" alt="Uploaded Image" style="display:none; max-width: 100%; height: auto;"/>
+            </div>
+        </div>
+
+        <!-- Canvas for drawing -->
+        <div id="draw-section" style="display: none;">
+            <h2 class="text-center">Draw a Digit</h2>
+            <div class="text-center mb-4">
+                <canvas id="canvas" width="280" height="280"></canvas><br>
+                <button id="clear-canvas" class="btn btn-secondary mt-2">Clear</button>
+                <button id="submit-canvas" class="btn btn-primary mt-2">Predict</button>
+            </div>
         </div>
 
         <!-- Predictions section -->
@@ -59,6 +72,18 @@
     <!-- jQuery script to handle form submission and display predictions -->
     <script>
         $(document).ready(function () {
+            // Handle option selection
+            $('#option-select').on('change', function () {
+                var option = $(this).val();
+                if (option === 'upload') {
+                    $('#upload-section').show();
+                    $('#draw-section').hide();
+                } else if (option === 'draw') {
+                    $('#upload-section').hide();
+                    $('#draw-section').show();
+                }
+            });
+
             // Handle image upload form submission
             $('#upload-form').on('submit', function (event) {
                 event.preventDefault();
@@ -98,7 +123,7 @@
                 ctx.beginPath();
             }).mousemove(function (event) {
                 if (drawing) {
-                    var rect = canvas.getBoundingClientRect();
+                    var rect =canvas.getBoundingClientRect();
                     var x = event.clientX - rect.left;
                     var y = event.clientY - rect.top;
                     ctx.lineWidth = 10;
@@ -138,6 +163,11 @@
             // Initialize the canvas background to black
             ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Set the initial option to 'upload'
+            $('#option-select').val('upload');
+            $('#upload-section').show();
+            $('#draw-section').hide();
         });
     </script>
     <!-- Include Bootstrap JS and Popper.js -->
