@@ -15,7 +15,6 @@ cnn_model = load_model('cnn_model.h5')
 # Define function to preprocess image
 def preprocess_image(img):
     img = img.convert('L')  # Convert to grayscale
-    img = ImageOps.invert(img)  # Invert image to get white digit on black background
     img = img.resize((28, 28))  # Resize to MNIST standard size
     img_array = np.array(img)  # Convert image to numpy array
     img_array = img_array / 255.0  # Normalize pixel values
